@@ -1,0 +1,8 @@
+{
+  "name": "Hand Music AI 023",
+  "description": "Generates music based on hand movements detected via camera.",
+  "requestFramePermissions": [
+    "camera"
+  ],
+  "prompt": ""
+}

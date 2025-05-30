@@ -1,0 +1,16 @@
+{
+  "compilerOptions": {
+    "target": "es2020",        // Компилировать в современный JavaScript
+    "module": "es2020",        // Использовать ES-модули
+    "jsx": "react",            // Поддержка JSX (даже если не используется React Framework полностью)
+    "esModuleInterop": true,   // Улучшает совместимость с CommonJS модулями
+    "forceConsistentCasingInFileNames": true, // Контроль регистра имен файлов
+    "strict": true,            // Включить все строгие проверки типов
+    "skipLibCheck": true,      // Пропускать проверку типов для declaration-файлов библиотек
+    "moduleResolution": "node",// Стандартный способ разрешения модулей Node.js
+    "allowJs": true            // Разрешить компиляцию JS файлов (на всякий случай)
+    // "outDir": ".",          // Можно раскомментировать, если нужно явно указать, что выходной файл в той же директории
+                              // По умолчанию tsc index.tsx создаст index.js рядом
+  },
+  "include": ["index.tsx"]     // Указывает, какие файлы компилировать
+}
