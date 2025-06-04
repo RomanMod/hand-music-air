@@ -1,0 +1,19 @@
+{
+  "compilerOptions": {
+    "target": "es6",
+    "module": "es6",
+    "jsx": "react",
+    "outDir": ".",
+    "strict": true,
+    "esModuleInterop": true,
+    "skipLibCheck": true,
+    "forceConsistentCasingInFileNames": true,
+    "lib": ["es2017", "dom"]
+  },
+  "include": [
+    "index.tsx"
+  ],
+  "exclude": [
+    "node_modules"
+  ]
+}

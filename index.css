@@ -1,0 +1,934 @@
+
+
+
+body {
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+    margin: 0;
+    padding: 0;
+    background-color: #1a1a2e;
+    color: #e0e0fc;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: flex-start; /* Align to top for scroll */
+    min-height: 100vh;
+    overflow-x: hidden;
+    overflow-y: auto;
+    -webkit-tap-highlight-color: transparent;
+    padding-top: 10px; /* Add some padding at the top */
+}
+
+.container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+    width: 100%;
+    max-width: 600px;
+    padding: 10px;
+    box-sizing: border-box;
+}
+
+#app-title {
+    color: #9fa8da;
+    margin-bottom: 10px;
+}
+
+.equalizer-container {
+    display: flex;
+    justify-content: space-between;
+    width: 90vw;
+    max-width: 500px;
+    margin-bottom: 10px;
+    padding: 0 5px;
+    box-sizing: border-box;
+}
+
+.equalizer-group {
+    display: flex;
+    justify-content: space-around;
+    align-items: flex-start; 
+    width: 48%;
+}
+
+.equalizer-bar-wrapper {
+    display: flex;
+    flex-direction: column; 
+    align-items: center;
+    justify-content: flex-start; 
+    width: 18%; 
+    border-radius: 4px;
+    padding-bottom: 2px; /* Small padding for focus outline */
+}
+
+/* Clickable styles for mute, only in fingerkeys mode */
+.equalizer-container.fingerkeys-mode-active .equalizer-bar-wrapper {
+    cursor: pointer;
+}
+
+.equalizer-container.fingerkeys-mode-active .equalizer-bar-wrapper:hover,
+.equalizer-container.fingerkeys-mode-active .equalizer-bar-wrapper:focus {
+    outline: 2px solid #82aaff; /* Highlight on hover/focus */
+    background-color: rgba(74, 78, 105, 0.3);
+}
+
+
+.equalizer-bar {
+    width: 100%;
+    height: 50px; 
+    background-color: #2c2c54;
+    border: 1px solid #4a4e69;
+    border-radius: 3px;
+    position: relative;
+    overflow: hidden;
+    display: flex;
+    align-items: flex-end; 
+    margin-bottom: 2px; /* Space for label */
+}
+
+.equalizer-bar-fill {
+    width: 100%;
+    height: 0%; 
+    transition: height 0.05s linear, background-color 0.1s ease-out;
+    border-radius: 2px;
+}
+
+.equalizer-bar-value {
+    position: absolute;
+    top: 3px;
+    left: 50%;
+    transform: translateX(-50%);
+    font-size: 9px;
+    font-weight: bold;
+    color: #FFFFFF;
+    pointer-events: none;
+    z-index: 2; 
+    text-shadow: 0 0 2px rgba(0,0,0,0.7);
+}
+
+
+.left-fill { 
+    background-color: #007bff; 
+}
+
+.right-fill { 
+    background-color: #ffc107; 
+}
+
+.equalizer-label {
+    font-size: 10px;
+    color: #9fa8da;
+    text-align: center;
+    line-height: 1; 
+    margin-bottom: 3px; /* Space before threshold controls */
+}
+
+/* Styles for Muted Finger Indicators */
+.finger-muted .equalizer-bar-fill {
+    background-color: #6c757d !important; /* Muted gray, override hand color */
+    opacity: 0.5;
+}
+.finger-muted .equalizer-label {
+    opacity: 0.5;
+    text-decoration: line-through;
+}
+.finger-muted .equalizer-bar-value {
+    opacity: 0.5;
+}
+.finger-muted .equalizer-bar {
+    border-color: #5a5e79; /* Darker border for muted bar */
+}
+
+
+/* Finger Threshold Controls */
+.finger-threshold-controls {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 2px; /* Smaller gap for compact layout */
+    width: 100%;
+    margin-top: 1px;
+    margin-bottom: 2px; /* Space before file controls */
+}
+
+.threshold-adjust-button {
+    background-color: #4a4e69;
+    color: #e0e0fc;
+    border: none;
+    border-radius: 4px; /* Slightly less rounded */
+    padding: 0; /* Remove padding */
+    width: 16px; /* Fixed width */
+    height: 16px; /* Fixed height */
+    font-size: 12px; /* Adjust font size if needed */
+    font-weight: bold;
+    line-height: 16px; /* Center text vertically */
+    text-align: center;
+    cursor: pointer;
+    transition: background-color 0.2s;
+}
+
+.threshold-adjust-button:hover,
+.threshold-adjust-button:focus {
+    background-color: #6a6d8f;
+    outline: none;
+}
+
+.threshold-value-display {
+    font-size: 9px;
+    color: #c3c9e9; /* Lighter color for value */
+    min-width: 26px; /* Ensure space for "100%" */
+    text-align: center;
+    padding: 0 1px;
+    font-weight: bold;
+}
+
+.threshold-controls-hidden {
+    display: none !important;
+}
+
+
+/* Per-Finger Audio File Input Controls */
+.finger-audio-file-controls {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 2px;
+    width: 100%;
+    margin-top: 2px;
+}
+
+.finger-file-input {
+    display: none; /* Hidden, triggered by styled label/button */
+}
+
+.finger-file-input-button {
+    background-color: #4a4e69;
+    color: #c3c9e9;
+    border: 1px solid #6a6d8f;
+    border-radius: 3px;
+    padding: 1px 4px;
+    font-size: 8px;
+    cursor: pointer;
+    text-align: center;
+    width: 80%;
+    box-sizing: border-box;
+    transition: background-color 0.2s;
+}
+
+.finger-file-input-button:hover,
+.finger-file-input-button:focus {
+    background-color: #6a6d8f;
+    color: #e0e0fc;
+    outline: none;
+}
+
+.finger-file-status {
+    font-size: 8px;
+    color: #9fa8da;
+    text-align: center;
+    width: 100%;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    padding: 0 2px;
+    box-sizing: border-box;
+    min-height: 9px; /* Reserve space for one line */
+}
+
+
+.video-container {
+    position: relative;
+    width: 90vw;
+    max-width: 500px;
+    aspect-ratio: 4 / 3;
+    border-radius: 12px;
+    overflow: hidden;
+    box-shadow: 0 8px 16px rgba(0, 0, 0, 0.3);
+    background-color: #2c2c54;
+    margin-bottom: 15px;
+}
+
+#input-video, #output-canvas {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    border-radius: 12px;
+}
+
+#input-video {
+    transform: scaleX(-1); 
+}
+
+#output-canvas {
+    pointer-events: none; 
+    transform: scaleX(-1); 
+}
+
+/* Calibration Overlay Styles */
+.calibration-overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.75); /* Semi-transparent dark background */
+    color: white;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    text-align: center;
+    padding: 20px;
+    box-sizing: border-box;
+    z-index: 100; /* Ensure it's on top of video/canvas */
+    border-radius: 12px; /* Match video container */
+    pointer-events: none; /* Allow clicks to pass through if needed, though not for this overlay */
+}
+
+#calibration-overlay-instruction-text {
+    font-size: 1.3em;
+    font-weight: bold;
+    margin-bottom: 10px;
+    line-height: 1.4;
+}
+
+#calibration-overlay-instruction-text strong { /* For "Руки не видны!" */
+    display: inline-block; /* Ensure <br> works before it */
+    margin-top: 8px;
+}
+
+
+#calibration-overlay-countdown-timer {
+    font-size: 1.1em;
+    font-style: italic;
+    margin-top: 5px;
+}
+
+
+.controls-panel {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    width: 100%;
+    gap: 15px; 
+}
+
+.control-group { /* Common styling for fieldsets */
+    border: 1px solid #4a4e69;
+    border-radius: 8px;
+    padding: 10px 15px;
+    width: 100%;
+    max-width: 400px;
+    box-sizing: border-box;
+    transition: opacity 0.3s ease; /* For smooth disabling visual */
+}
+
+.control-group legend {
+    font-size: 14px;
+    font-weight: bold;
+    color: #9fa8da;
+    padding: 0 5px; 
+    margin-left: 5px; 
+    transition: color 0.3s ease; /* For smooth disabling visual */
+    display: flex; /* Added for aligning help button */
+    align-items: center; /* Added for aligning help button */
+    justify-content: space-between; /* Distribute text and button */
+    width: calc(100% - 10px); /* Adjust width to account for padding */
+}
+
+/* Styles for the clickable toggle legends */
+.toggle-legend {
+    cursor: pointer;
+    user-select: none; /* Prevent text selection on click */
+    position: relative;
+    padding-left: 25px !important; 
+    margin-left: 0 !important; 
+    /* width: 100%; Ensure legend takes full width for clickability, handled by parent now */
+}
+
+.toggle-legend::before {
+    content: '▶'; /* Collapsed state icon */
+    position: absolute;
+    left: 8px;
+    top: 50%;
+    transform: translateY(-50%);
+    font-size: 0.8em;
+    transition: transform 0.2s ease-in-out;
+}
+
+.toggle-legend[aria-expanded="true"]::before {
+    transform: translateY(-50%) rotate(90deg); /* Expanded state icon */
+}
+
+.toggle-legend:hover, .toggle-legend:focus {
+    color: #c3c9e9;
+    outline: none; /* Or custom outline */
+}
+.toggle-legend:focus-visible {
+    outline: 2px solid #82aaff;
+    outline-offset: 2px;
+}
+
+/* ARIA disabled styling */
+.toggle-legend[aria-disabled="true"] {
+    cursor: not-allowed;
+    color: #797c9a !important; /* Darker, less interactive color */
+}
+.toggle-legend[aria-disabled="true"]::before {
+    opacity: 0.5;
+}
+
+/* Help Button Styles */
+.help-button {
+    background-color: transparent;
+    border: 1px solid #9fa8da;
+    color: #9fa8da;
+    border-radius: 50%;
+    width: 20px;
+    height: 20px;
+    font-size: 12px;
+    font-weight: bold;
+    line-height: 18px; /* Adjust for vertical centering of '?' */
+    text-align: center;
+    cursor: help;
+    margin-left: auto; /* Push to the right */
+    padding: 0;
+    flex-shrink: 0; /* Prevent shrinking */
+}
+
+.help-button:hover, .help-button:focus {
+    background-color: #4a4e69;
+    color: #e0e0fc;
+    outline: none;
+}
+
+.help-button:focus-visible {
+    border-color: #82aaff;
+}
+
+
+/* Help Description Content Styles */
+.help-description-content {
+    background-color: #2c2c54;
+    border: 1px solid #4a4e69;
+    border-radius: 6px;
+    padding: 10px;
+    margin-top: 8px; /* Space below legend */
+    margin-bottom: 8px; /* Space above main content */
+    font-size: 18px; /* Updated font size */
+    color: #e0e0fc;
+    text-align: left;
+    line-height: 1.4;
+    /* content-hidden class will hide it by default */
+}
+
+
+/* Container for collapsible settings content */
+#settings-content,
+#performance-profile-content-to-toggle,
+#calibration-content-to-toggle,
+#playback-mode-content-to-toggle,
+#sound-settings-content-to-toggle,
+#audio-panning-mode-content-to-toggle,
+#distance-mode-content-to-toggle {
+    padding-top: 10px; /* Add some space between legend and content */
+    display: flex; /* Enable flex for children alignment */
+    flex-direction: column;
+    gap: 10px; /* Space between child elements like calibration fieldset and buttons */
+}
+#visualization-content-to-toggle {
+    padding-top: 10px;
+    display: flex;
+    flex-direction: column;
+    gap: 8px; /* Spacing between visualization buttons */
+}
+
+
+#performance-profile-content-to-toggle,
+#calibration-content-to-toggle,
+#playback-mode-content-to-toggle,
+#sound-settings-content-to-toggle,
+#audio-panning-mode-content-to-toggle,
+#distance-mode-content-to-toggle {
+    padding-top: 8px; /* Or adjust as needed */
+}
+
+
+.content-hidden {
+    display: none !important;
+}
+
+
+.control-group.control-group-disabled {
+    opacity: 0.6;
+    pointer-events: none; 
+}
+
+.control-group.control-group-disabled legend {
+    color: #797c9a; 
+}
+.control-group.control-group-disabled legend .help-button {
+    opacity: 0.7; /* Dim help button too */
+    cursor: not-allowed;
+}
+
+
+.control-group.control-group-disabled .radio-group-container label {
+    cursor: not-allowed;
+    color: #9fa8da80; /* Dimmed label text */
+}
+
+.control-group div label.label-disabled { /* Specific class for disabling labels */
+    cursor: not-allowed;
+    color: #9fa8da80 !important; /* Ensure it overrides general label color */
+}
+
+.control-group .radio-group-container {
+    display: flex;
+    flex-wrap: wrap; 
+    justify-content: flex-start; 
+    align-items: center;
+    gap: 5px 15px; 
+    padding-top: 5px;
+}
+
+.control-group div input[type="radio"],
+.control-group div input[type="checkbox"] {
+    margin-right: 4px;
+    accent-color: #007bff; 
+    vertical-align: middle;
+}
+
+.control-group div label {
+    font-size: 13px; 
+    color: #e0e0fc;
+    vertical-align: middle;
+    cursor: pointer;
+    transition: color 0.3s ease; 
+}
+.checkbox-control {
+    display: flex;
+    align-items: center;
+    margin-bottom: 8px; /* Space below checkbox line */
+}
+
+.checkbox-control input[type="checkbox"] {
+    width: 15px;
+    height: 15px;
+}
+.checkbox-control label {
+    margin-left: 6px; /* Space between checkbox and its label */
+}
+
+
+.settings-label { 
+    font-size: 13px;
+    color: #e0e0fc;
+    margin-right: 10px;
+    font-weight: normal;
+    display: block; 
+    margin-bottom: 5px;
+}
+
+#oscillator-type-selector .settings-label {
+    margin-bottom: 0; 
+    align-self: center;
+}
+
+
+.slider-control {
+    margin-top: 10px;
+}
+
+.slider-control label {
+    font-size: 13px;
+    color: #e0e0fc;
+    display: block; 
+    margin-bottom: 5px;
+}
+.slider-control label span { 
+    font-weight: bold;
+    color: #c3c9e9;
+    margin-left: 5px;
+    min-width: 60px; 
+    display: inline-block; 
+}
+
+.slider-control input[type="range"] {
+    width: 100%;
+    accent-color: #007bff;
+    cursor: pointer;
+}
+
+.profile-description {
+    font-size: 12px;
+    color: #c3c9e9;
+    margin-top: 10px;
+    padding: 8px;
+    background-color: rgba(44, 44, 84, 0.5); 
+    border-radius: 4px;
+    border: 1px solid #4a4e69;
+    line-height: 1.5;
+}
+.profile-description b {
+    color: #e0e0fc;
+}
+.profile-description i {
+    color: #9fa8da;
+}
+
+
+#control-button,
+#start-calibration-button,
+#cancel-calibration-button {
+    padding: 10px 20px;
+    font-size: 15px;
+    font-weight: bold;
+    color: #e0e0fc;
+    background-color: #4a4e69;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: background-color 0.3s ease, transform 0.1s ease;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+}
+#control-button {
+     width: 80%; 
+     max-width: 300px; 
+     padding: 12px 25px;
+     font-size: 16px;
+}
+
+/* General button styles for hover and active */
+#control-button:hover,
+#start-calibration-button:hover,
+#cancel-calibration-button:hover {
+    background-color: #6a6d8f;
+}
+
+#control-button:active,
+#start-calibration-button:active,
+#cancel-calibration-button:active {
+    transform: scale(0.98);
+    background-color: #7b7ea3;
+}
+
+#control-button[aria-pressed="true"] {
+    background-color: #007bff; 
+}
+
+#control-button[aria-pressed="true"]:hover {
+    background-color: #0056b3; 
+}
+
+
+/* Specific styles for visualization buttons */
+#visualization-content-to-toggle > button {
+    padding: 8px 15px;         /* Compact padding */
+    font-size: 13px;           /* Smaller font */
+    font-weight: normal;       /* Less emphasis */
+    color: #e0e0fc;
+    background-color: #4a4e69;
+    border: none;
+    border-radius: 6px;        /* Slightly smaller radius */
+    cursor: pointer;
+    transition: background-color 0.3s ease, transform 0.1s ease;
+    box-shadow: none;          /* No shadow */
+    margin-top: 0;
+    width: 100%;               /* Full width in their container */
+    box-sizing: border-box;
+    text-align: center;
+}
+
+#visualization-content-to-toggle > button:hover {
+    background-color: #6a6d8f;
+}
+
+#visualization-content-to-toggle > button:active {
+    transform: scale(0.98);
+    background-color: #7b7ea3;
+}
+
+/* Generic disabled states for buttons and controls */
+#start-calibration-button:disabled, /* Added for completeness */
+#cancel-calibration-button:disabled, /* Added for completeness */
+#visualization-content-to-toggle > button:disabled, /* Targets viz buttons specifically */
+button[disabled], /* General disabled button */
+input[type="range"]:disabled + label,
+input[type="checkbox"]:disabled + label { 
+    opacity: 0.5;
+    cursor: not-allowed;
+}
+
+/* Ensure disabled buttons maintain a consistent base background */
+#start-calibration-button:disabled,
+#cancel-calibration-button:disabled,
+#visualization-content-to-toggle > button:disabled,
+button[disabled] {
+    background-color: #4a4e69 !important; /* Keep base color, prevent hover changes */
+}
+#visualization-content-to-toggle > button:disabled:hover {
+    background-color: #4a4e69 !important; /* No hover change when disabled */
+}
+
+
+#audio-effects-panel .slider-control input[type="range"]:disabled {
+    accent-color: #6c757d; /* Grey out disabled sliders */
+}
+
+
+#status-message {
+    margin-top: 10px; 
+    font-size: 14px;
+    color: #9fa8da;
+    min-height: 20px; 
+}
+
+#calibration-instructions {
+    font-size: 13px; 
+    line-height: 1.4;
+    color: #c3c9e9; 
+    min-height: 1em; 
+}
+
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border-width: 0;
+}
+
+/* Custom Pairs Configuration Styles */
+#custom-pairs-config-container {
+    /* Uses .control-group for base styling */
+}
+
+.hidden-control-group {
+    display: none !important;
+}
+
+.custom-pair-finger-config-wrapper {
+    display: flex;
+    flex-direction: column;
+    gap: 8px; 
+    margin-top: 8px;
+}
+
+.custom-pair-finger-config {
+    display: flex;
+    align-items: center;
+    gap: 8px; 
+}
+
+.custom-pair-finger-config label {
+    font-size: 13px;
+    color: #e0e0fc;
+    min-width: 40px; 
+    text-align: right;
+}
+
+.custom-pair-finger-config select {
+    padding: 6px 8px;
+    font-size: 13px;
+    background-color: #2c2c54;
+    color: #e0e0fc;
+    border: 1px solid #4a4e69;
+    border-radius: 5px;
+    cursor: pointer;
+    outline: none;
+    flex-grow: 1; 
+    max-width: 120px; 
+}
+
+.custom-pair-finger-config select:disabled {
+    opacity: 0.7;
+    cursor: not-allowed;
+}
+
+.custom-pair-finger-config span { 
+    color: #9fa8da;
+}
+
+#audio-effects-panel {
+    /* Uses .control-group base, add specific styles if needed */
+}
+
+#audio-effects-panel legend {
+    font-size: 13px; /* Slightly smaller legend for sub-panel */
+    color: #c3c9e9;
+    margin-bottom: 5px;
+}
+
+#reverb-controls, #delay-controls {
+    padding: 5px 0;
+}
+
+.effects-divider {
+    border: 0;
+    height: 1px;
+    background-color: #4a4e69;
+    margin: 10px 0;
+}
+
+
+@media (max-width: 600px) {
+    .container {
+        padding-top: 5px;
+    }
+    .equalizer-container {
+        width: 95vw;
+    }
+    .equalizer-bar {
+        height: 35px; 
+    }
+    .equalizer-bar-value {
+        font-size: 8px; 
+        top: 2px;
+    }
+    .equalizer-label {
+        font-size: 9px;
+        margin-bottom: 2px;
+    }
+
+    .finger-threshold-controls {
+        gap: 1px;
+    }
+    .threshold-adjust-button {
+        width: 14px;
+        height: 14px;
+        font-size: 10px;
+        line-height: 14px;
+    }
+    .threshold-value-display {
+        font-size: 8px;
+        min-width: 22px;
+    }
+
+    .finger-file-input-button {
+        padding: 0px 3px;
+        font-size: 7px;
+    }
+    .finger-file-status {
+        font-size: 7px;
+    }
+
+
+    .video-container {
+        width: 95vw;
+    }
+
+    #calibration-overlay-instruction-text {
+        font-size: 1.1em; 
+    }
+    #calibration-overlay-countdown-timer {
+        font-size: 1em; 
+    }
+    
+    .control-group .radio-group-container {
+        flex-direction: column;
+        gap: 8px;
+        align-items: flex-start;
+        padding-left: 10px; 
+    }
+    #oscillator-type-selector.radio-group-container {
+        padding-left: 0; 
+    }
+    #oscillator-type-selector .settings-label {
+        margin-left: 10px; 
+    }
+    #oscillator-type-selector div { 
+       margin-left: 10px;
+    }
+
+    .slider-control {
+        padding-left: 10px;
+        padding-right: 10px;
+    }
+
+    .profile-description {
+        margin-left: 10px;
+        margin-right: 10px;
+        font-size: 11px;
+    }
+    .help-description-content {
+        /* font-size: 11px; /* Let it inherit or be overridden by general 18px */
+        margin-left: 5px; /* Align with content */
+        margin-right: 5px;
+    }
+
+
+    #calibration-controls-container #calibration-content-to-toggle p#calibration-instructions {
+        padding-left: 10px; 
+    }
+    
+    #settings-content > div.content-hidden,
+    #settings-content > fieldset > div.content-hidden {
+        padding-left: 10px; 
+    }
+
+    /* Adjust width for buttons inside settings on mobile */
+    #settings-content > button, 
+    #settings-content > fieldset > div > button, /* Catches viz buttons */
+    #calibration-content-to-toggle > button, 
+    #calibration-content-to-toggle > div#calibration-action-buttons > button 
+     { 
+        width: calc(100% - 20px); 
+        margin-left: 10px;
+        margin-right: 10px;
+        box-sizing: border-box;
+    }
+     /* Ensure viz buttons get their specific mobile styling if needed, or inherit from above */
+    #visualization-content-to-toggle > button {
+        width: calc(100% - 20px); /* Override the 100% if inside settings and mobile */
+        margin-left: 10px;
+        margin-right: 10px;
+    }
+
+    
+    #calibration-action-buttons {
+        display: flex !important; 
+        flex-direction: column;
+        width: 100%;
+        align-items: center;
+        gap: 10px; 
+    }
+
+
+    #app-title {
+        font-size: 1.5em;
+    }
+
+    #control-button {
+        padding: 15px 30px;
+        font-size: 18px;
+        width: 90%; 
+        max-width: 350px;
+    }
+
+    .custom-pair-finger-config {
+        flex-wrap: wrap; 
+    }
+    .custom-pair-finger-config label {
+        min-width: 35px; 
+        text-align: left;
+        margin-bottom: 3px;
+        width: 100%; 
+    }
+    .custom-pair-finger-config select {
+        font-size: 12px;
+        max-width: none; 
+        width: calc(50% - 12px); 
+    }
+
+    #audio-effects-panel .slider-control label,
+    #audio-effects-panel .checkbox-control label {
+        font-size: 12px;
+    }
+}

@@ -1,0 +1,543 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <title>Hand Music AI</title>
+    <link rel="stylesheet" href="index.css">
+    <script src="https://cdn.jsdelivr.net/npm/@mediapipe/hands/hands.js" crossorigin="anonymous"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@mediapipe/camera_utils/camera_utils.js" crossorigin="anonymous"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@mediapipe/drawing_utils/drawing_utils.js" crossorigin="anonymous"></script>
+<link rel="stylesheet" href="/index.css">
+</head>
+<body>
+    <div class="container">
+        <!-- Removed <h1 id="app-title">Интерактивные Жесты Рук со Звуком</h1> -->
+
+        <div class="equalizer-container" aria-label="Индикаторы расстояния пальцев">
+            <div class="equalizer-group" aria-label="Визуальные расстояния пальцев физически правой руки (на экране слева, управляется правой рукой)">
+                <!-- R-P -->
+                <div class="equalizer-bar-wrapper" id="r-p-bar-wrapper" role="button" tabindex="0" aria-pressed="false" title="Отключить звук и реакцию пальца R-P (физ. правая рука, мизинец)">
+                    <div class="equalizer-bar">
+                        <div id="right-finger-p-bar-fill" class="equalizer-bar-fill right-fill"></div>
+                        <span id="right-finger-p-bar-value" class="equalizer-bar-value">0%</span>
+                    </div>
+                    <span class="equalizer-label">R-P</span>
+                    <div class="finger-threshold-controls threshold-controls-hidden" id="r-p-threshold-controls">
+                        <button class="threshold-adjust-button" data-finger-key-id="R-P" data-action="decrease" aria-label="Уменьшить порог для R-P (физ. правая рука, мизинец)">-</button>
+                        <span id="r-p-threshold-value" class="threshold-value-display">70%</span>
+                        <button class="threshold-adjust-button" data-finger-key-id="R-P" data-action="increase" aria-label="Увеличить порог для R-P (физ. правая рука, мизинец)">+</button>
+                    </div>
+                    <div class="finger-audio-file-controls content-hidden" id="r-p-audio-file-controls">
+                        <input type="file" id="r-p-file-input" class="finger-file-input" data-finger-key-id="R-P" accept=".mp3,.wav,audio/mpeg,audio/wav" aria-label="Выбрать файл для R-P">
+                        <label for="r-p-file-input" class="finger-file-input-button" role="button" tabindex="0">Файл...</label>
+                        <span id="r-p-file-status" class="finger-file-status">Не выбран</span>
+                    </div>
+                </div>
+                <!-- R-R -->
+                <div class="equalizer-bar-wrapper" id="r-r-bar-wrapper" role="button" tabindex="0" aria-pressed="false" title="Отключить звук и реакцию пальца R-R (физ. правая рука, безымянный)">
+                    <div class="equalizer-bar">
+                        <div id="right-finger-r-bar-fill" class="equalizer-bar-fill right-fill"></div>
+                        <span id="right-finger-r-bar-value" class="equalizer-bar-value">0%</span>
+                    </div>
+                    <span class="equalizer-label">R-R</span>
+                    <div class="finger-threshold-controls threshold-controls-hidden" id="r-r-threshold-controls">
+                        <button class="threshold-adjust-button" data-finger-key-id="R-R" data-action="decrease" aria-label="Уменьшить порог для R-R (физ. правая рука, безымянный)">-</button>
+                        <span id="r-r-threshold-value" class="threshold-value-display">70%</span>
+                        <button class="threshold-adjust-button" data-finger-key-id="R-R" data-action="increase" aria-label="Увеличить порог для R-R (физ. правая рука, безымянный)">+</button>
+                    </div>
+                    <div class="finger-audio-file-controls content-hidden" id="r-r-audio-file-controls">
+                        <input type="file" id="r-r-file-input" class="finger-file-input" data-finger-key-id="R-R" accept=".mp3,.wav,audio/mpeg,audio/wav" aria-label="Выбрать файл для R-R">
+                        <label for="r-r-file-input" class="finger-file-input-button" role="button" tabindex="0">Файл...</label>
+                        <span id="r-r-file-status" class="finger-file-status">Не выбран</span>
+                    </div>
+                </div>
+                <!-- R-M -->
+                <div class="equalizer-bar-wrapper" id="r-m-bar-wrapper" role="button" tabindex="0" aria-pressed="false" title="Отключить звук и реакцию пальца R-M (физ. правая рука, средний)">
+                    <div class="equalizer-bar">
+                        <div id="right-finger-m-bar-fill" class="equalizer-bar-fill right-fill"></div>
+                        <span id="right-finger-m-bar-value" class="equalizer-bar-value">0%</span>
+                    </div>
+                    <span class="equalizer-label">R-M</span>
+                    <div class="finger-threshold-controls threshold-controls-hidden" id="r-m-threshold-controls">
+                        <button class="threshold-adjust-button" data-finger-key-id="R-M" data-action="decrease" aria-label="Уменьшить порог для R-M (физ. правая рука, средний)">-</button>
+                        <span id="r-m-threshold-value" class="threshold-value-display">70%</span>
+                        <button class="threshold-adjust-button" data-finger-key-id="R-M" data-action="increase" aria-label="Увеличить порог для R-M (физ. правая рука, средний)">+</button>
+                    </div>
+                    <div class="finger-audio-file-controls content-hidden" id="r-m-audio-file-controls">
+                        <input type="file" id="r-m-file-input" class="finger-file-input" data-finger-key-id="R-M" accept=".mp3,.wav,audio/mpeg,audio/wav" aria-label="Выбрать файл для R-M">
+                        <label for="r-m-file-input" class="finger-file-input-button" role="button" tabindex="0">Файл...</label>
+                        <span id="r-m-file-status" class="finger-file-status">Не выбран</span>
+                    </div>
+                </div>
+                <!-- R-I -->
+                <div class="equalizer-bar-wrapper" id="r-i-bar-wrapper" role="button" tabindex="0" aria-pressed="false" title="Отключить звук и реакцию пальца R-I (физ. правая рука, указательный)">
+                    <div class="equalizer-bar">
+                        <div id="right-finger-i-bar-fill" class="equalizer-bar-fill right-fill"></div>
+                        <span id="right-finger-i-bar-value" class="equalizer-bar-value">0%</span>
+                    </div>
+                    <span class="equalizer-label">R-I</span>
+                    <div class="finger-threshold-controls threshold-controls-hidden" id="r-i-threshold-controls">
+                        <button class="threshold-adjust-button" data-finger-key-id="R-I" data-action="decrease" aria-label="Уменьшить порог для R-I (физ. правая рука, указательный)">-</button>
+                        <span id="r-i-threshold-value" class="threshold-value-display">70%</span>
+                        <button class="threshold-adjust-button" data-finger-key-id="R-I" data-action="increase" aria-label="Увеличить порог для R-I (физ. правая рука, указательный)">+</button>
+                    </div>
+                    <div class="finger-audio-file-controls content-hidden" id="r-i-audio-file-controls">
+                        <input type="file" id="r-i-file-input" class="finger-file-input" data-finger-key-id="R-I" accept=".mp3,.wav,audio/mpeg,audio/wav" aria-label="Выбрать файл для R-I">
+                        <label for="r-i-file-input" class="finger-file-input-button" role="button" tabindex="0">Файл...</label>
+                        <span id="r-i-file-status" class="finger-file-status">Не выбран</span>
+                    </div>
+                </div>
+                <!-- R-T -->
+                <div class="equalizer-bar-wrapper" id="r-t-bar-wrapper" role="button" tabindex="0" aria-pressed="false" title="Отключить звук и реакцию пальца R-T (физ. правая рука, большой)">
+                    <div class="equalizer-bar">
+                        <div id="right-finger-t-bar-fill" class="equalizer-bar-fill right-fill"></div>
+                        <span id="right-finger-t-bar-value" class="equalizer-bar-value">0%</span>
+                    </div>
+                    <span class="equalizer-label">R-T</span>
+                    <div class="finger-threshold-controls threshold-controls-hidden" id="r-t-threshold-controls">
+                        <button class="threshold-adjust-button" data-finger-key-id="R-T" data-action="decrease" aria-label="Уменьшить порог для R-T (физ. правая рука, большой)">-</button>
+                        <span id="r-t-threshold-value" class="threshold-value-display">70%</span>
+                        <button class="threshold-adjust-button" data-finger-key-id="R-T" data-action="increase" aria-label="Увеличить порог для R-T (физ. правая рука, большой)">+</button>
+                    </div>
+                    <div class="finger-audio-file-controls content-hidden" id="r-t-audio-file-controls">
+                        <input type="file" id="r-t-file-input" class="finger-file-input" data-finger-key-id="R-T" accept=".mp3,.wav,audio/mpeg,audio/wav" aria-label="Выбрать файл для R-T">
+                        <label for="r-t-file-input" class="finger-file-input-button" role="button" tabindex="0">Файл...</label>
+                        <span id="r-t-file-status" class="finger-file-status">Не выбран</span>
+                    </div>
+                </div>
+            </div>
+            <div class="equalizer-group" aria-label="Визуальные расстояния пальцев физически левой руки (на экране справа, управляется левой рукой)">
+                <!-- L-T -->
+                <div class="equalizer-bar-wrapper" id="l-t-bar-wrapper" role="button" tabindex="0" aria-pressed="false" title="Отключить звук и реакцию пальца L-T (физ. левая рука, большой)">
+                    <div class="equalizer-bar">
+                        <div id="left-finger-t-bar-fill" class="equalizer-bar-fill left-fill"></div>
+                        <span id="left-finger-t-bar-value" class="equalizer-bar-value">0%</span>
+                    </div>
+                    <span class="equalizer-label">L-T</span>
+                    <div class="finger-threshold-controls threshold-controls-hidden" id="l-t-threshold-controls">
+                        <button class="threshold-adjust-button" data-finger-key-id="L-T" data-action="decrease" aria-label="Уменьшить порог для L-T (физ. левая рука, большой)">-</button>
+                        <span id="l-t-threshold-value" class="threshold-value-display">70%</span>
+                        <button class="threshold-adjust-button" data-finger-key-id="L-T" data-action="increase" aria-label="Увеличить порог для L-T (физ. левая рука, большой)">+</button>
+                    </div>
+                     <div class="finger-audio-file-controls content-hidden" id="l-t-audio-file-controls">
+                        <input type="file" id="l-t-file-input" class="finger-file-input" data-finger-key-id="L-T" accept=".mp3,.wav,audio/mpeg,audio/wav" aria-label="Выбрать файл для L-T">
+                        <label for="l-t-file-input" class="finger-file-input-button" role="button" tabindex="0">Файл...</label>
+                        <span id="l-t-file-status" class="finger-file-status">Не выбран</span>
+                    </div>
+                </div>
+                <!-- L-I -->
+                <div class="equalizer-bar-wrapper" id="l-i-bar-wrapper" role="button" tabindex="0" aria-pressed="false" title="Отключить звук и реакцию пальца L-I (физ. левая рука, указательный)">
+                    <div class="equalizer-bar">
+                        <div id="left-finger-i-bar-fill" class="equalizer-bar-fill left-fill"></div>
+                        <span id="left-finger-i-bar-value" class="equalizer-bar-value">0%</span>
+                    </div>
+                    <span class="equalizer-label">L-I</span>
+                    <div class="finger-threshold-controls threshold-controls-hidden" id="l-i-threshold-controls">
+                        <button class="threshold-adjust-button" data-finger-key-id="L-I" data-action="decrease" aria-label="Уменьшить порог для L-I (физ. левая рука, указательный)">-</button>
+                        <span id="l-i-threshold-value" class="threshold-value-display">70%</span>
+                        <button class="threshold-adjust-button" data-finger-key-id="L-I" data-action="increase" aria-label="Увеличить порог для L-I (физ. левая рука, указательный)">+</button>
+                    </div>
+                     <div class="finger-audio-file-controls content-hidden" id="l-i-audio-file-controls">
+                        <input type="file" id="l-i-file-input" class="finger-file-input" data-finger-key-id="L-I" accept=".mp3,.wav,audio/mpeg,audio/wav" aria-label="Выбрать файл для L-I">
+                        <label for="l-i-file-input" class="finger-file-input-button" role="button" tabindex="0">Файл...</label>
+                        <span id="l-i-file-status" class="finger-file-status">Не выбран</span>
+                    </div>
+                </div>
+                <!-- L-M -->
+                <div class="equalizer-bar-wrapper" id="l-m-bar-wrapper" role="button" tabindex="0" aria-pressed="false" title="Отключить звук и реакцию пальца L-M (физ. левая рука, средний)">
+                    <div class="equalizer-bar">
+                        <div id="left-finger-m-bar-fill" class="equalizer-bar-fill left-fill"></div>
+                        <span id="left-finger-m-bar-value" class="equalizer-bar-value">0%</span>
+                    </div>
+                    <span class="equalizer-label">L-M</span>
+                    <div class="finger-threshold-controls threshold-controls-hidden" id="l-m-threshold-controls">
+                        <button class="threshold-adjust-button" data-finger-key-id="L-M" data-action="decrease" aria-label="Уменьшить порог для L-M (физ. левая рука, средний)">-</button>
+                        <span id="l-m-threshold-value" class="threshold-value-display">70%</span>
+                        <button class="threshold-adjust-button" data-finger-key-id="L-M" data-action="increase" aria-label="Увеличить порог для L-M (физ. левая рука, средний)">+</button>
+                    </div>
+                     <div class="finger-audio-file-controls content-hidden" id="l-m-audio-file-controls">
+                        <input type="file" id="l-m-file-input" class="finger-file-input" data-finger-key-id="L-M" accept=".mp3,.wav,audio/mpeg,audio/wav" aria-label="Выбрать файл для L-M">
+                        <label for="l-m-file-input" class="finger-file-input-button" role="button" tabindex="0">Файл...</label>
+                        <span id="l-m-file-status" class="finger-file-status">Не выбран</span>
+                    </div>
+                </div>
+                <!-- L-R -->
+                <div class="equalizer-bar-wrapper" id="l-r-bar-wrapper" role="button" tabindex="0" aria-pressed="false" title="Отключить звук и реакцию пальца L-R (физ. левая рука, безымянный)">
+                    <div class="equalizer-bar">
+                        <div id="left-finger-r-bar-fill" class="equalizer-bar-fill left-fill"></div>
+                        <span id="left-finger-r-bar-value" class="equalizer-bar-value">0%</span>
+                    </div>
+                    <span class="equalizer-label">L-R</span>
+                    <div class="finger-threshold-controls threshold-controls-hidden" id="l-r-threshold-controls">
+                        <button class="threshold-adjust-button" data-finger-key-id="L-R" data-action="decrease" aria-label="Уменьшить порог для L-R (физ. левая рука, безымянный)">-</button>
+                        <span id="l-r-threshold-value" class="threshold-value-display">70%</span>
+                        <button class="threshold-adjust-button" data-finger-key-id="L-R" data-action="increase" aria-label="Увеличить порог для L-R (физ. левая рука, безымянный)">+</button>
+                    </div>
+                     <div class="finger-audio-file-controls content-hidden" id="l-r-audio-file-controls">
+                        <input type="file" id="l-r-file-input" class="finger-file-input" data-finger-key-id="L-R" accept=".mp3,.wav,audio/mpeg,audio/wav" aria-label="Выбрать файл для L-R">
+                        <label for="l-r-file-input" class="finger-file-input-button" role="button" tabindex="0">Файл...</label>
+                        <span id="l-r-file-status" class="finger-file-status">Не выбран</span>
+                    </div>
+                </div>
+                <!-- L-P -->
+                <div class="equalizer-bar-wrapper" id="l-p-bar-wrapper" role="button" tabindex="0" aria-pressed="false" title="Отключить звук и реакцию пальца L-P (физ. левая рука, мизинец)">
+                    <div class="equalizer-bar">
+                        <div id="left-finger-p-bar-fill" class="equalizer-bar-fill left-fill"></div>
+                        <span id="left-finger-p-bar-value" class="equalizer-bar-value">0%</span>
+                    </div>
+                    <span class="equalizer-label">L-P</span>
+                    <div class="finger-threshold-controls threshold-controls-hidden" id="l-p-threshold-controls">
+                        <button class="threshold-adjust-button" data-finger-key-id="L-P" data-action="decrease" aria-label="Уменьшить порог для L-P (физ. левая рука, мизинец)">-</button>
+                        <span id="l-p-threshold-value" class="threshold-value-display">70%</span>
+                        <button class="threshold-adjust-button" data-finger-key-id="L-P" data-action="increase" aria-label="Увеличить порог для L-P (физ. левая рука, мизинец)">+</button>
+                    </div>
+                    <div class="finger-audio-file-controls content-hidden" id="l-p-audio-file-controls">
+                        <input type="file" id="l-p-file-input" class="finger-file-input" data-finger-key-id="L-P" accept=".mp3,.wav,audio/mpeg,audio/wav" aria-label="Выбрать файл для L-P">
+                        <label for="l-p-file-input" class="finger-file-input-button" role="button" tabindex="0">Файл...</label>
+                        <span id="l-p-file-status" class="finger-file-status">Не выбран</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="video-container">
+            <video id="input-video" autoplay playsinline muted></video>
+            <canvas id="output-canvas"></canvas>
+            <div id="calibration-overlay-message" class="calibration-overlay content-hidden" aria-live="assertive" aria-atomic="true">
+                <span id="calibration-overlay-instruction-text"></span>
+                <span id="calibration-overlay-countdown-timer"></span>
+            </div>
+        </div>
+        <div class="controls-panel">
+            <fieldset id="settings-container" class="control-group">
+                <legend id="settings-toggle-legend" class="toggle-legend" tabindex="0" role="button" aria-expanded="false" aria-controls="settings-content">
+                    Настройки
+                    <button type="button" class="help-button" id="main-settings-help-button" aria-label="Помощь по разделу настроек" aria-controls="main-settings-help-description" aria-expanded="false">(?)</button>
+                </legend>
+                <div id="main-settings-help-description" class="help-description-content content-hidden" role="tooltip">
+                    <!-- Help text will be injected by JS -->
+                </div>
+                <div id="settings-content" class="settings-collapsible-content content-hidden">
+                    
+                    <fieldset id="sound-settings-controls" class="control-group">
+                        <legend id="sound-settings-toggle-legend" class="toggle-legend" tabindex="0" role="button" aria-expanded="false" aria-controls="sound-settings-content-to-toggle">
+                            Настройки звука (глобальные)
+                            <button type="button" class="help-button" id="sound-settings-help-button" aria-label="Помощь по настройкам звука" aria-controls="sound-settings-help-description" aria-expanded="false">(?)</button>
+                        </legend>
+                        <div id="sound-settings-help-description" class="help-description-content content-hidden" role="tooltip">
+                            <!-- Help text will be injected by JS -->
+                        </div>
+                         <div id="sound-settings-content-to-toggle" class="content-hidden">
+                            <div class="radio-group-container" id="oscillator-type-selector" role="radiogroup" aria-labelledby="osc-type-label">
+                                <span id="osc-type-label" class="settings-label">Тип осциллятора:</span>
+                                <div>
+                                    <input type="radio" id="osc-sine" name="osc-type" value="sine">
+                                    <label for="osc-sine">Синусоида</label>
+                                </div>
+                                <div>
+                                    <input type="radio" id="osc-square" name="osc-type" value="square">
+                                    <label for="osc-square">Меандр</label>
+                                </div>
+                                <div>
+                                    <input type="radio" id="osc-sawtooth" name="osc-type" value="sawtooth">
+                                    <label for="osc-sawtooth">Пилообразная</label>
+                                </div>
+                                <div>
+                                    <input type="radio" id="osc-triangle" name="osc-type" value="triangle">
+                                    <label for="osc-triangle">Треугольная</label>
+                                </div>
+                                <div>
+                                    <input type="radio" id="osc-bell3" name="osc-type" value="bell3">
+                                    <label for="osc-bell3">Колокольчик 3 (синтез)</label>
+                                </div>
+                                <div>
+                                    <input type="radio" id="osc-cosmic-harmony" name="osc-type" value="cosmic_harmony">
+                                    <label for="osc-cosmic-harmony">Космическая гармония (SFX)</label>
+                                </div>
+                                 <div>
+                                    <input type="radio" id="osc-gusli" name="osc-type" value="gusli">
+                                    <label for="osc-gusli">Гусли (синтез)</label>
+                                </div>
+                                <div>
+                                    <input type="radio" id="osc-piano-cmajor" name="osc-type" value="piano_c_major">
+                                    <label for="osc-piano-cmajor">Пианино (До мажор)</label>
+                                </div>
+                                <div>
+                                    <input type="radio" id="osc-water-drop" name="osc-type" value="water_drop">
+                                    <label for="osc-water-drop">Капли воды (SFX)</label>
+                                </div>
+                                <div>
+                                    <input type="radio" id="osc-bell-mp3" name="osc-type" value="bell_mp3">
+                                    <label for="osc-bell-mp3">Колокольчик (MP3)</label>
+                                </div>
+                                <div>
+                                    <input type="radio" id="osc-local-file" name="osc-type" value="custom_local_file">
+                                    <label for="osc-local-file" id="osc-local-file-label-text">Локальный файл (глоб.)</label>
+                                </div>
+                                <div>
+                                    <input type="radio" id="osc-dual-hand-wav" name="osc-type" value="dual_hand_wav" checked>
+                                    <label for="osc-dual-hand-wav">Двойной WAV (Л/П)</label>
+                                </div>
+                                <div>
+                                    <input type="radio" id="osc-finger-specific-files" name="osc-type" value="finger_specific_local_files">
+                                    <label for="osc-finger-specific-files">Индивидуальные (MP3/WAV)</label>
+                                </div>
+                            </div>
+                            <div id="local-file-input-container" class="content-hidden" style="margin-top: 8px; padding-left:10px">
+                                <label for="local-audio-upload-input" class="settings-label" style="display: block; margin-bottom: 5px;">Файл (MP3/WAV) для глобального режима:</label>
+                                <input type="file" id="local-audio-upload-input" accept=".mp3,.wav,audio/mpeg,audio/wav" aria-labelledby="local-audio-upload-input-label">
+                                <span id="local-audio-upload-input-label" class="sr-only">Выберите локальный MP3 или WAV файл</span>
+                                <span id="local-file-status" style="font-size: 12px; color: #9fa8da; margin-top: 5px; display: block;">Файл не выбран</span>
+                            </div>
+                            <div class="slider-control">
+                                <label for="filter-cutoff-slider">Фильтр (срез): <span id="filter-cutoff-value">12000 Гц</span></label>
+                                <input type="range" id="filter-cutoff-slider" min="100" max="12000" step="50" value="12000" aria-labelledby="filter-cutoff-value">
+                            </div>
+                            <div class="slider-control">
+                                <label for="filter-q-slider">Фильтр (резонанс Q): <span id="filter-q-value">1.0</span></label>
+                                <input type="range" id="filter-q-slider" min="0.1" max="20" step="0.1" value="1" aria-labelledby="filter-q-value">
+                            </div>
+
+                            <div style="margin-top: 15px;">
+                                <span class="settings-label" id="panning-mode-sub-label">Режим аудиовыхода:</span>
+                                <div class="radio-group-container" role="radiogroup" aria-labelledby="panning-mode-sub-label" style="padding-left: 10px;">
+                                    <div>
+                                        <input type="radio" id="panning-mode-stereo" name="panning-mode" value="stereo">
+                                        <label for="panning-mode-stereo">Стерео (по рукам)</label>
+                                    </div>
+                                    <div>
+                                        <input type="radio" id="panning-mode-mono" name="panning-mode" value="mono" checked>
+                                        <label for="panning-mode-mono">Моно (центр)</label>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <fieldset id="audio-effects-panel" class="control-group content-hidden" style="margin-top:15px;">
+                                <legend>Аудиоэффекты (для MP3/WAV)</legend>
+                                <div id="delay-controls">
+                                     <div class="checkbox-control">
+                                        <input type="checkbox" id="enable-delay-checkbox" name="enable-delay">
+                                        <label for="enable-delay-checkbox">Включить Дилэй (Эхо)</label>
+                                    </div>
+                                    <div class="slider-control">
+                                        <label for="delay-time-slider">Время задержки: <span id="delay-time-value">200 мс</span></label>
+                                        <input type="range" id="delay-time-slider" min="20" max="1000" step="10" value="200" aria-labelledby="delay-time-value">
+                                    </div>
+                                    <div class="slider-control">
+                                        <label for="delay-feedback-slider">Обратная связь: <span id="delay-feedback-value">0%</span></label>
+                                        <input type="range" id="delay-feedback-slider" min="0" max="0.9" step="0.01" value="0" aria-labelledby="delay-feedback-value">
+                                    </div>
+                                    <div class="slider-control">
+                                        <label for="delay-level-slider">Уровень дилэя: <span id="delay-level-value">0%</span></label>
+                                        <input type="range" id="delay-level-slider" min="0" max="1" step="0.01" value="0" aria-labelledby="delay-level-value">
+                                    </div>
+                                </div>
+                            </fieldset>
+                        </div>
+                    </fieldset>
+                    
+                    <fieldset id="distance-mode-selector" class="control-group">
+                        <legend id="distance-mode-toggle-legend" class="toggle-legend" tabindex="0" role="button" aria-expanded="false" aria-controls="distance-mode-content-to-toggle">
+                            Режим расчета расстояния
+                            <button type="button" class="help-button" id="distance-mode-help-button" aria-label="Помощь по режиму расчета расстояния" aria-controls="distance-mode-help-description" aria-expanded="false">(?)</button>
+                        </legend>
+                        <div id="distance-mode-help-description" class="help-description-content content-hidden" role="tooltip">
+                            <!-- Help text will be injected by JS -->
+                        </div>
+                        <div id="distance-mode-content-to-toggle" class="content-hidden">
+                            <div class="radio-group-container">
+                                <div>
+                                    <input type="radio" id="mode-dist-wrist-tip" name="distance-mode" value="wrist_tip" checked>
+                                    <label for="mode-dist-wrist-tip">От запястья до кончика</label>
+                                </div>
+                                <div>
+                                    <input type="radio" id="mode-dist-custom-points" name="distance-mode" value="custom_points">
+                                    <label for="mode-dist-custom-points">Между указанными точками</label>
+                                </div>
+                                 <div>
+                                    <input type="radio" id="mode-dist-custom-user-defined" name="distance-mode" value="custom_user_defined">
+                                    <label for="mode-dist-custom-user-defined">Кастомный (пользовательский)</label>
+                                </div>
+                            </div>
+                        </div>
+                    </fieldset>
+
+                    <fieldset id="playback-mode-selector" class="control-group">
+                        <legend id="playback-mode-toggle-legend" class="toggle-legend" tabindex="0" role="button" aria-expanded="false" aria-controls="playback-mode-content-to-toggle">
+                            Режим взаимодействия
+                            <button type="button" class="help-button" id="playback-mode-help-button" aria-label="Помощь по режимам взаимодействия" aria-controls="playback-mode-help-description" aria-expanded="false">(?)</button>
+                        </legend>
+                        <div id="playback-mode-help-description" class="help-description-content content-hidden" role="tooltip">
+                            <!-- Help text will be injected by JS -->
+                        </div>
+                        <div id="playback-mode-content-to-toggle" class="content-hidden">
+                            <div class="radio-group-container">
+                                <div>
+                                    <input type="radio" id="mode-theremin" name="playback-mode" value="theremin">
+                                    <label for="mode-theremin">Визуализатор и звук</label>
+                                </div>
+                                <div>
+                                    <input type="radio" id="mode-tappad" name="playback-mode" value="tappad">
+                                    <label for="mode-tappad">Сенсорные пэды со звуком</label>
+                                </div>
+                                <div>
+                                    <input type="radio" id="mode-fingerkeys" name="playback-mode" value="fingerkeys" checked>
+                                    <label for="mode-fingerkeys">Пальцевые индикаторы со звуком</label>
+                                </div>
+                            </div>
+                        </div>
+                    </fieldset>
+
+                    <fieldset id="visualization-controls-container" class="control-group">
+                        <legend id="visualization-toggle-legend" class="toggle-legend" tabindex="0" role="button" aria-expanded="false" aria-controls="visualization-content-to-toggle">
+                            Визуализация
+                            <button type="button" class="help-button" id="visualization-help-button" aria-label="Помощь по настройкам визуализации" aria-controls="visualization-help-description" aria-expanded="false">(?)</button>
+                        </legend>
+                        <div id="visualization-help-description" class="help-description-content content-hidden" role="tooltip">
+                           <!-- Help text will be injected by JS -->
+                        </div>
+                        <div id="visualization-content-to-toggle" class="content-hidden">
+                            <button id="toggle-hand-shapes-button" aria-pressed="true">Скрыть индикаторы рук</button>
+                            <button id="toggle-threshold-visibility-button" aria-expanded="false">Показать настройки порогов</button>
+                            <button id="toggle-landmark-numbers-button" aria-pressed="false">Показать номера точек</button>
+                        </div>
+                    </fieldset>
+
+                    <fieldset id="calibration-controls-container" class="control-group hidden-control-group">
+                        <legend id="calibration-toggle-legend" class="toggle-legend" tabindex="0" role="button" aria-expanded="false" aria-controls="calibration-content-to-toggle">
+                            Настройка чувствительности клавиш
+                            <button type="button" class="help-button" id="calibration-help-button" aria-label="Помощь по настройке чувствительности" aria-controls="calibration-help-description" aria-expanded="false">(?)</button>
+                        </legend>
+                        <div id="calibration-help-description" class="help-description-content content-hidden" role="tooltip">
+                            <!-- Help text will be injected by JS -->
+                        </div>
+                        <div id="calibration-content-to-toggle" class="content-hidden">
+                            <button id="start-calibration-button">Начать настройку зоны чувствительности</button>
+                            <p id="calibration-instructions" style="margin-top: 10px; min-height: 1em;">&nbsp;</p>
+                            <div id="calibration-action-buttons" style="margin-top: 10px; display: none;">
+                                <button id="cancel-calibration-button">Отмена</button>
+                            </div>
+                        </div>
+                    </fieldset>
+
+                     <fieldset id="performance-profile-selector" class="control-group">
+                        <legend id="performance-profile-toggle-legend" class="toggle-legend" tabindex="0" role="button" aria-expanded="false" aria-controls="performance-profile-content-to-toggle">
+                            Профиль производительности
+                            <button type="button" class="help-button" id="performance-profile-help-button" aria-label="Помощь по профилю производительности" aria-controls="performance-profile-help-description" aria-expanded="false">(?)</button>
+                        </legend>
+                        <div id="performance-profile-help-description" class="help-description-content content-hidden" role="tooltip">
+                            <!-- Help text will be injected by JS -->
+                        </div>
+                        <div id="performance-profile-content-to-toggle" class="content-hidden">
+                            <div class="radio-group-container" role="radiogroup" aria-labelledby="performance-profile-legend-main">
+                                <span id="performance-profile-legend-main" class="sr-only">Выберите профиль производительности</span>
+                                <div>
+                                    <input type="radio" id="perf-profile-max" name="performance-profile" value="max" aria-describedby="performance-profile-description">
+                                    <label for="perf-profile-max">Макс. (качество)</label>
+                                </div>
+                                <div>
+                                    <input type="radio" id="perf-profile-medium" name="performance-profile" value="medium" aria-describedby="performance-profile-description">
+                                    <label for="perf-profile-medium">Средний (баланс)</label>
+                                </div>
+                                <div>
+                                    <input type="radio" id="perf-profile-min" name="performance-profile" value="min" aria-describedby="performance-profile-description">
+                                    <label for="perf-profile-min">Мин. (скорость)</label>
+                                </div>
+                                <div>
+                                    <input type="radio" id="perf-profile-ultra-min" name="performance-profile" value="ultra_min" aria-describedby="performance-profile-description">
+                                    <label for="perf-profile-ultra-min">Ультра Мин. (экстрим)</label>
+                                </div>
+                            </div>
+                            <div id="performance-profile-description" class="profile-description" aria-live="polite">
+                                <!-- Описание будет здесь -->
+                            </div>
+                        </div>
+                    </fieldset>
+
+                </div>
+            </fieldset>
+            
+            <fieldset id="custom-pairs-config-container" class="control-group hidden-control-group">
+                <legend>
+                    Настройка пар точек (Кастомный режим)
+                    <button type="button" class="help-button" id="custom-pairs-help-button" aria-label="Помощь по настройке пар точек" aria-controls="custom-pairs-help-description" aria-expanded="false">(?)</button>
+                </legend>
+                <div id="custom-pairs-help-description" class="help-description-content content-hidden" role="tooltip">
+                    <!-- Help text will be injected by JS -->
+                </div>
+                <div class="custom-pair-finger-config-wrapper">
+                    <!-- Right Hand -->
+                    <div class="custom-pair-finger-config">
+                        <label for="r-p-point1-select">R-P:</label>
+                        <select id="r-p-point1-select" data-finger-key-id="R-P" data-point-index="0" aria-label="R-P (физ. правая рука, мизинец) Точка 1"></select>
+                        <span>-</span>
+                        <select id="r-p-point2-select" data-finger-key-id="R-P" data-point-index="1" aria-label="R-P (физ. правая рука, мизинец) Точка 2"></select>
+                    </div>
+                    <div class="custom-pair-finger-config">
+                        <label for="r-r-point1-select">R-R:</label>
+                        <select id="r-r-point1-select" data-finger-key-id="R-R" data-point-index="0" aria-label="R-R (физ. правая рука, безымянный) Точка 1"></select>
+                        <span>-</span>
+                        <select id="r-r-point2-select" data-finger-key-id="R-R" data-point-index="1" aria-label="R-R (физ. правая рука, безымянный) Точка 2"></select>
+                    </div>
+                    <div class="custom-pair-finger-config">
+                        <label for="r-m-point1-select">R-M:</label>
+                        <select id="r-m-point1-select" data-finger-key-id="R-M" data-point-index="0" aria-label="R-M (физ. правая рука, средний) Точка 1"></select>
+                        <span>-</span>
+                        <select id="r-m-point2-select" data-finger-key-id="R-M" data-point-index="1" aria-label="R-M (физ. правая рука, средний) Точка 2"></select>
+                    </div>
+                    <div class="custom-pair-finger-config">
+                        <label for="r-i-point1-select">R-I:</label>
+                        <select id="r-i-point1-select" data-finger-key-id="R-I" data-point-index="0" aria-label="R-I (физ. правая рука, указательный) Точка 1"></select>
+                        <span>-</span>
+                        <select id="r-i-point2-select" data-finger-key-id="R-I" data-point-index="1" aria-label="R-I (физ. правая рука, указательный) Точка 2"></select>
+                    </div>
+                    <div class="custom-pair-finger-config">
+                        <label for="r-t-point1-select">R-T:</label>
+                        <select id="r-t-point1-select" data-finger-key-id="R-T" data-point-index="0" aria-label="R-T (физ. правая рука, большой) Точка 1"></select>
+                        <span>-</span>
+                        <select id="r-t-point2-select" data-finger-key-id="R-T" data-point-index="1" aria-label="R-T (физ. правая рука, большой) Точка 2"></select>
+                    </div>
+                    <!-- Left Hand -->
+                    <div class="custom-pair-finger-config">
+                        <label for="l-t-point1-select">L-T:</label>
+                        <select id="l-t-point1-select" data-finger-key-id="L-T" data-point-index="0" aria-label="L-T (физ. левая рука, большой) Точка 1"></select>
+                        <span>-</span>
+                        <select id="l-t-point2-select" data-finger-key-id="L-T" data-point-index="1" aria-label="L-T (физ. левая рука, большой) Точка 2"></select>
+                    </div>
+                     <div class="custom-pair-finger-config">
+                        <label for="l-i-point1-select">L-I:</label>
+                        <select id="l-i-point1-select" data-finger-key-id="L-I" data-point-index="0" aria-label="L-I (физ. левая рука, указательный) Точка 1"></select>
+                        <span>-</span>
+                        <select id="l-i-point2-select" data-finger-key-id="L-I" data-point-index="1" aria-label="L-I (физ. левая рука, указательный) Точка 2"></select>
+                    </div>
+                    <div class="custom-pair-finger-config">
+                        <label for="l-m-point1-select">L-M:</label>
+                        <select id="l-m-point1-select" data-finger-key-id="L-M" data-point-index="0" aria-label="L-M (физ. левая рука, средний) Точка 1"></select>
+                        <span>-</span>
+                        <select id="l-m-point2-select" data-finger-key-id="L-M" data-point-index="1" aria-label="L-M (физ. левая рука, средний) Точка 2"></select>
+                    </div>
+                    <div class="custom-pair-finger-config">
+                        <label for="l-r-point1-select">L-R:</label>
+                        <select id="l-r-point1-select" data-finger-key-id="L-R" data-point-index="0" aria-label="L-R (физ. левая рука, безымянный) Точка 1"></select>
+                        <span>-</span>
+                        <select id="l-r-point2-select" data-finger-key-id="L-R" data-point-index="1" aria-label="L-R (физ. левая рука, безымянный) Точка 2"></select>
+                    </div>
+                    <div class="custom-pair-finger-config">
+                        <label for="l-p-point1-select">L-P:</label>
+                        <select id="l-p-point1-select" data-finger-key-id="L-P" data-point-index="0" aria-label="L-P (физ. левая рука, мизинец) Точка 1"></select>
+                        <span>-</span>
+                        <select id="l-p-point2-select" data-finger-key-id="L-P" data-point-index="1" aria-label="L-P (физ. левая рука, мизинец) Точка 2"></select>
+                    </div>
+                </div>
+            </fieldset>
+
+            <button id="control-button" aria-pressed="false">Старт</button>
+        </div>
+        <p id="status-message">Предоставьте доступ к камере</p>
+    </div>
+
+    <script type="module" src="index.js"></script>
+<script type="module" src="/index.tsx"></script>
+</body>
+</html>

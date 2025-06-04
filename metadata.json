@@ -1,0 +1,8 @@
+{
+  "name": "Hand Music AI 041",
+  "description": "Generates sine wave sounds based on hand movements and gestures detected via camera, with multiple interaction modes.",
+  "requestFramePermissions": [
+    "camera"
+  ],
+  "prompt": ""
+}
